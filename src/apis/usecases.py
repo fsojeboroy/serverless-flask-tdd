@@ -41,7 +41,12 @@ def post_order(payload: List) -> Dict:
         abort(400)
 
 def process_order(sqs_event: Dict):
-    """Retrieves order from queue and insert into the database."""
+    """Retrieves order from queue and insert into the database.
+
+    Args:
+        sqs_event (dict): AWS Lambda event object from sqs
+    """
+
     order = _parse_order_from_sqs_event(sqs_event)
     _validate_order(order['items'])
     _insert_order_to_db(order)
