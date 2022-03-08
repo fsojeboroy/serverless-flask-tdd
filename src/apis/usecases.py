@@ -5,9 +5,9 @@ from uuid import uuid4
 
 from flask import abort
 
-from common.middlewares import aws_client
-from custom_exceptions import InvalidOrderException, InvalidMessageException
-from models import ProductLookup, Order
+from common.aws import client as aws_client
+from custom_exceptions import InvalidMessageException, InvalidOrderException
+from models import Order, ProductLookup
 
 
 def get_menu() -> List:
@@ -17,7 +17,8 @@ def get_menu() -> List:
         list: products and its quantity.
     """
 
-    return _get_products_from_db()
+    return {"menu": _get_products_from_db()}
+
 
 def post_order(payload: List) -> Dict:
     """Validates order and send to queue.
@@ -40,6 +41,7 @@ def post_order(payload: List) -> Dict:
     except InvalidOrderException:
         abort(400)
 
+
 def process_order(sqs_event: Dict):
     """Retrieves order from queue and insert into the database.
 
@@ -50,6 +52,7 @@ def process_order(sqs_event: Dict):
     order = _parse_order_from_sqs_event(sqs_event)
     _validate_order(order['items'])
     _insert_order_to_db(order)
+
 
 def get_order(order_uuid: str) -> Dict:
     """Query database for matching `order_uuid`
@@ -66,16 +69,19 @@ def get_order(order_uuid: str) -> Dict:
 
     return _get_order_from_db(order_uuid)
 
+
 def _get_products_from_db() -> List:
     return [product.attribute_values for product in ProductLookup.scan()]
+
 
 def _validate_order(order: List) -> None:
     if not _is_valid_order(order):
         raise InvalidOrderException()
 
+
 def _is_valid_order(order: List) -> bool:
     menu = get_menu()
-    menu = {item['name'].lower():item['quantity'] for item in menu}
+    menu = {item['name'].lower(): item['quantity'] for item in menu}
     try:
         if not order:
             return False
@@ -94,8 +100,10 @@ def _is_valid_order(order: List) -> bool:
         return False
     return True
 
+
 def _build_order_message(order: List) -> Dict:
     return dict(order_uuid=str(uuid4()), items=order)
+
 
 def _push_order_to_sqs(order_message: Dict):
     client = aws_client('sqs')
@@ -103,6 +111,7 @@ def _push_order_to_sqs(order_message: Dict):
         QueueUrl=os.environ['ORDER_QUEUE_URL'],
         MessageBody=json.dumps(order_message)
     )
+
 
 def _parse_order_from_sqs_event(sqs_event: Dict) -> Dict:
     try:
@@ -113,8 +122,10 @@ def _parse_order_from_sqs_event(sqs_event: Dict) -> Dict:
     except (KeyError, TypeError, json.JSONDecodeError) as e:
         raise InvalidMessageException(e)
 
+
 def _insert_order_to_db(order: Dict):
     Order(order['order_uuid'], items=order['items']).save()
+
 
 def _get_order_from_db(order_uuid: str) -> Dict:
     try:

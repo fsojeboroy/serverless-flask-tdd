@@ -11,4 +11,4 @@ printf "\e[33m%b\e[0m\n" "Installing python dependencies"
 python -m pip install --upgrade pip
 python -m pip install pipenv
 mkdir -p .venv
-python -m pipenv install -d --ignore-pipfile
+python -m pipenv install -d

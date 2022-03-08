@@ -4,19 +4,27 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
-werkzeug = "*"
 boto3 = "*"
-flask-restx = "*"
-serverless-wsgi = "*"
 pynamodb = "*"
+flask = "*"
+flask-accepts = "*"
+flask-marshmallow = "*"
+flask-restx = "*"
+werkzeug = "*"
+serverless-wsgi = "*"
 
 [dev-packages]
-pytest = "*"
+autopep8 = "*"
+isort = "*"
+flake8 = "*"
+flake8-awesome = "*"
 moto = "*"
+pipenv = "*"
+pylint = "*"
+pytest = "*"
+pytest-cov = "*"
 pytest-dotenv = "*"
 py-event-mocks = "*"
-pytest-cov = "*"
 
 [requires]
 python_version = "3.8"

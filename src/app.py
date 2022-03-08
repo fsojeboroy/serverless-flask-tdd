@@ -1,11 +1,12 @@
 from flask import Flask
 
 from apis import routes
-from app_context import api, db
+from app_context import api, db, ma
 
 app = Flask(__name__)
 app.config['RESTX_MASK_SWAGGER'] = False
 
 db.init_app(app)
+ma.init_app(app)
 routes.add_resources()
 api.init_app(app)

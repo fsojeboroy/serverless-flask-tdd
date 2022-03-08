@@ -52,7 +52,7 @@ package:
 
 functions:
   appApis:
-    handler: src.wsgi.handler
+    handler: src.lambda_handlers.handler
     layers:
       - { Ref: PythonRequirementsLambdaLayer }
     events:
@@ -60,7 +60,7 @@ functions:
       - http: POST /order
       - http: GET /order/{order_uuid}
   orderProcessor:
-    handler: src.wsgi.order_processor_handler
+    handler: src.lambda_handlers.order_processor_handler
     layers:
       - { Ref: PythonRequirementsLambdaLayer }
     events:

@@ -4,7 +4,7 @@ import pytest
 from moto import mock_dynamodb2, mock_sqs
 
 from app import app, db
-from common.middlewares import aws_client
+from common.aws import client as aws_client
 from models import ProductLookup, Order
 
 @pytest.fixture(scope='function')

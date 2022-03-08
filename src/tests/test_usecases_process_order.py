@@ -5,17 +5,11 @@ import pytest
 from py_event_mocks import create_event
 
 from apis.controllers import OrderProcessorController
-from apis.usecases import _parse_order_from_sqs_event, _insert_order_to_db
-
+from apis.usecases import _insert_order_to_db, _parse_order_from_sqs_event
 from custom_exceptions import InvalidMessageException
 
-
-@mock.patch('apis.controllers.process_order')
-def test_process_order_controller_should_trigger_process_order_usecase(mock_process_order):
-    OrderProcessorController(sqs_event={}).process()
-    mock_process_order.assert_called()
-
 # # def test_process_order_given_valid_event_should_trigger_expected_methods(mock_insert_order_to_db, mock_validate_order_from_sqs_event_message, mock_parse_order_from_sqs_event):
+
 
 @pytest.mark.parametrize('order_message', [
     dict(order_uuid='abcd1234', items=[{"name": "Water", "quantity": 2}]),
@@ -30,10 +24,13 @@ def test_parse_order_from_sqs_event_given_valid_params_should_return_expected(or
     actual = _parse_order_from_sqs_event(event)
     assert actual == expected
 
+
 def create_sqs_event_with_empty_body():
     event = create_event('aws:sqs')
     event['Records'][0]['body'] = ""
     return event
+
+
 @pytest.mark.parametrize('event', [
     None, [], {},
     create_event('aws:sqs'),
@@ -43,6 +40,7 @@ def create_sqs_event_with_empty_body():
 def test_parse_order_from_sqs_event_given_invalid_params_should_raise_expected(event):
     with pytest.raises(InvalidMessageException):
         _parse_order_from_sqs_event(event)
+
 
 @pytest.mark.parametrize('order_message', [
     dict(order_uuid='abcd1234', items=[{"name": "Water", "quantity": 2}]),
